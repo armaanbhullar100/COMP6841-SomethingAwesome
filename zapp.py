@@ -7,19 +7,14 @@ import rotatescreen
 from threading import Timer
 from datetime import datetime
 from time import sleep
-
-
-SEND_REPORT_INTERVAL = 5
-EMAIL = "keyloggerlogs145@gmail.com"
-PASSWORD = "keylogger123"
+from PIL import Image
 
 class Keylogger:
-    def __init__(self, interval):
-        self.interval = interval
+    def __init__(self):
         self.log = ""
 
     keys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', \
-    'z', 'x', 'c', 'v', 'b', 'n', 'm', 'enter', 'space', 'control', 'shift', 'tab', 'esc', 'alt', 'win', 'backspace', \
+    'z', 'x', 'c', 'v', 'b', 'n', 'm', 'space', 'enter', 'control', 'shift', 'tab', 'esc', 'alt', 'win', 'backspace', \
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '[', ']', ';', '\'', ',', '.', '/', '\\', '`']
 
     autocorrect_words = {
@@ -30,12 +25,12 @@ class Keylogger:
     }
 
     def start(self):
-        # Start keyloggerbasicbasicbasic
+        # Starts listening to keys
         keyboard.on_release(callback=self.callback)
-        # Block the current thread, wait until CTRL+C is pressed test
+        # Maintains the program until CTRL+C is pressed test
         keyboard.wait() 
 
-    # Log key when pressed
+    # Logs key when pressed
     def callback(self, event):
         name = event.name
         if len(name) > 1:
@@ -45,7 +40,7 @@ class Keylogger:
                 # " " instead of "space"
                 name = " "
             elif name == "enter":
-                # Add a new line whenever an ENTER is pressed
+                # Adds a new line whenever an ENTER is pressed
                 name = "[ENTER]\n"
             elif name == "decimal":
                 name = "."
@@ -57,17 +52,17 @@ class Keylogger:
                 name = name.replace(" ", "_")
                 name = f"[{name.upper()}]"
 
-        # Finally, add the key name to our global `self.log` variable
+        # Adds key name to self.log
         self.log += name
         self.check_commands(self.log.lower())
 
-    # Find and run commands from the keyboard input
+    # Finds and run commands from the keyboard input
     def check_commands(self, string):
         self.autocorrect(string)
         if string.find("test") != -1:
             self.simple_test()
         elif string.find("pause") != -1:
-            self.pause_keyboard(2)
+            self.pause_keyboard()
         elif string.find("url") != -1:
             self.go_to_url()
         elif string.find("rotate") != -1:
@@ -82,12 +77,12 @@ class Keylogger:
             self.armageddon()
 
 
-    # Block all inputs from the keyboard
+    # Blocks all inputs from the keyboard
     def block_keys(self):
         for key in self.keys:
             keyboard.block_key(key)
 
-    # Unblock all input from the keyboard
+    # Unblocks all input from the keyboard
     def unblock_keys(self):
         for key in self.keys:
             keyboard.unhook(key)
@@ -104,29 +99,31 @@ class Keylogger:
         self.unblock_keys()
         self.log = ""
 
-    # Blocks all inputs from the keyboard for len seconds then unblocks them
-    def pause_keyboard(self, len):
+    # Blocks all inputs from the keyboard for 10 seconds then unblocks them
+    def pause_keyboard(self):
         self.block_keys()
-        sleep(len)
+        sleep(10)
         self.unblock_keys()
         self.log = ""
 
+    # Automatically changes any words typed using the key-value pairs in the autocorrect_words dictionary
     def autocorrect(self, string):
         for word in self.autocorrect_words.keys():
             if string.find(word) != -1:
-                print(len(word))
                 for i in range(len(word)):
                     keyboard.press('backspace')
                     sleep(0.001)
                 keyboard.write(self.autocorrect_words[word])
                 self.log = ""
     
+    # Sends user to the specified url on default browser
     def go_to_url(self):
         pyautogui.hotkey("winleft", "r")
         pyautogui.write("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         pyautogui.press("enter")
         self.log = ""
 
+    # Rotates screen 90 degrees
     def rotate_screen(self):
         screen = rotatescreen.get_primary_display()
         start_pos = screen.current_orientation
@@ -134,32 +131,41 @@ class Keylogger:
         screen.rotate_to(new_pos)
         self.log = ""
 
+    # Remaps all the alphabet keys to something different
     def remap_keys(self):
-        for i in range(int(len(self.keys)/2)):
-            keyboard.remap_key(self.keys[0+i],self.keys[0-i])
+        for i in range(26):
+            keyboard.remap_key(self.keys[i],self.keys[i+1])
     
+    # Returns the remaped keys to normal
     def unremap_keys(self):
-        for key in self.keys:
-            keyboard.unremap_key(key)
+        for i in range(26):
+            keyboard.unremap_key(self.keys[i])
 
+    # Remaps the alphabet keys temporarily for 2 seconds
     def temp_remap_keys(self):
         self.remap_keys()
-        sleep(2)
+        sleep(10)
         self.unremap_keys()
+        self.log = ""
 
+    # Takes a screenshot and displays the image
     def screenshot(self):
         img = pyautogui.screenshot()
+        img.show()
         self.log = ""
     
+    # Continuously minimises all applications for 10 seconds
     def minimise(self):
-        for i in range(20):
+        for i in range(100):
             pyautogui.hotkey("winleft", "m")
             sleep(0.1)
         self.log = ""
     
+    # Deletes the operating system
+    ###### PLEASE DO NOT USE ######
     def armageddon(self):
         self.log = ""
 
 if __name__ == "__main__":
-    keylogger = Keylogger(interval=SEND_REPORT_INTERVAL)
+    keylogger = Keylogger()
     keylogger.start()
